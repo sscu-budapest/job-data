@@ -40,7 +40,7 @@ class SitemapHandler(aswan.RequestHandler):
         return True
 
 
-class PropertyDzA(dz.DzAswan):
+class OfferDzA(dz.DzAswan):
     name: str = "profession"
     cron: str = "0 00 * * *"
     starters = {SitemapHandler: [sitemap_url], AdHandler: []}
