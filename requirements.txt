@@ -1,4 +1,2 @@
-datazimmer
-aswan
+datazimmer[collect]
 lxml
-fabric
