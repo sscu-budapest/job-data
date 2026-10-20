@@ -9,6 +9,7 @@ index_url = "https://www.profession.hu/sitemap-listings-index-hu.xml"
 
 
 class AdHandler(aswan.RequestHandler):
+    max_in_parallel = 2
     url_root = "https://www.profession.hu"
 
     def parse(self, blob):
@@ -20,6 +21,8 @@ class AdHandler(aswan.RequestHandler):
 
 
 class SitemapHandler(aswan.RequestHandler):
+    max_in_parallel = 2
+
     def parse(self, blob):
         listing_df = (
             pd.read_xml(BytesIO(blob))
@@ -58,6 +61,3 @@ class OfferDzA(dz.DzAswan):
     name: str = "profession"
     cadence: str = "1d"
     starters = {SitemapIndexHandler: [index_url], AdHandler: []}
-
-    def prepare_run(self):
-        self.project.max_cpu_use = 2
