@@ -4,11 +4,10 @@ import aswan
 import datazimmer as dz
 import pandas as pd
 
-sitemap_url = dz.SourceUrl("https://www.profession.hu/sitemap-allasok.xml")
+sitemap_url = "https://www.profession.hu/sitemap-allasok.xml"
 
 
 class AdHandler(aswan.RequestHandler):
-    process_indefinitely: bool = True
     url_root = "https://www.profession.hu"
 
     def parse(self, blob):
@@ -42,5 +41,8 @@ class SitemapHandler(aswan.RequestHandler):
 
 class OfferDzA(dz.DzAswan):
     name: str = "profession"
-    cron: str = "0 00 * * *"
+    cadence: str = "1d"
     starters = {SitemapHandler: [sitemap_url], AdHandler: []}
+
+    def prepare_run(self):
+        self.project.max_cpu_use = 2

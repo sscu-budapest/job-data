@@ -1,0 +1,10 @@
+[project]
+name = "job-data"
+version = "0.1"
+requires-python = ">=3.12"
+dependencies = ["datazimmer[collect]>=1.0.0", "lxml", "pandas"]
+
+[tool.datazimmer]
+name = "profession"
+version = "0.1"
+collectors = ["src.profession"]
