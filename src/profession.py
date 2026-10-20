@@ -5,7 +5,7 @@ import aswan
 import datazimmer as dz
 import pandas as pd
 
-sitemap_url = "https://www.profession.hu/sitemap-allasok.xml"
+index_url = "https://www.profession.hu/sitemap-listings-index-hu.xml"
 
 
 class AdHandler(aswan.RequestHandler):
@@ -25,9 +25,9 @@ class SitemapHandler(aswan.RequestHandler):
             pd.read_xml(BytesIO(blob))
             .assign(
                 ad_id=lambda _df: _df["loc"].str.split("-").str[-1].astype(int),
-                lastmod=lambda _df: pd.to_datetime(_df["lastmod"]),
+                lastmod=lambda _df: pd.to_datetime(_df["lastmod"], utc=True),
             )
-            .drop(columns=["changefreq"])
+            .drop(columns=["changefreq"], errors="ignore")
             .rename(columns={"loc": "url"})
         )
         self.register_links_to_handler(
@@ -40,10 +40,24 @@ class SitemapHandler(aswan.RequestHandler):
         return True
 
 
+class SitemapIndexHandler(aswan.RequestHandler):
+    def parse(self, blob):
+        index_df = pd.read_xml(BytesIO(blob))
+        self.register_links_to_handler(
+            links=index_df["loc"].values,
+            handler_cls=SitemapHandler,
+            overwrite=True,
+        )
+        return index_df
+
+    def is_session_broken(self, result: Union[int, Exception]):
+        return True
+
+
 class OfferDzA(dz.DzAswan):
     name: str = "profession"
     cadence: str = "1d"
-    starters = {SitemapHandler: [sitemap_url], AdHandler: []}
+    starters = {SitemapIndexHandler: [index_url], AdHandler: []}
 
     def prepare_run(self):
         self.project.max_cpu_use = 2
