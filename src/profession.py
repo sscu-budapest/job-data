@@ -1,3 +1,4 @@
+from io import BytesIO
 from typing import Union
 
 import aswan
@@ -21,7 +22,7 @@ class AdHandler(aswan.RequestHandler):
 class SitemapHandler(aswan.RequestHandler):
     def parse(self, blob):
         listing_df = (
-            pd.read_xml(blob)
+            pd.read_xml(BytesIO(blob))
             .assign(
                 ad_id=lambda _df: _df["loc"].str.split("-").str[-1].astype(int),
                 lastmod=lambda _df: pd.to_datetime(_df["lastmod"]),
